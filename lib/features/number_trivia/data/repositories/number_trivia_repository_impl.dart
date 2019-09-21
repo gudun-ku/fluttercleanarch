@@ -8,6 +8,8 @@ import 'package:clean_architecture_tdd_course/features/number_trivia/domain/repo
 import 'package:dartz/dartz.dart';
 import 'package:meta/meta.dart';
 
+typedef Future<NumberTrivia> _ConcreteOrRandomChoose();
+
 class NumberTriviaRepositoryImpl implements NumberTriviaRepository {
   final NumberTriviaRemoteDataSource remoteDataSource;
   final NumberTriviaLocalDataSource localDataSource;
@@ -37,7 +39,7 @@ class NumberTriviaRepositoryImpl implements NumberTriviaRepository {
 
   //higher order function to rescue from duplicationg code!!!
   Future<Either<Failure, NumberTrivia>> _getTrivia(
-      Future<NumberTrivia> Function() getConcreteOrRandom) async {
+      _ConcreteOrRandomChoose getConcreteOrRandom) async {
     if (await networkInfo.isConnected) {
       try {
         final remoteTrivia = await getConcreteOrRandom();
