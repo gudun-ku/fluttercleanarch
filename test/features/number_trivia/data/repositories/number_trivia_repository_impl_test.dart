@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:clean_architecture_tdd_course/core/error/exceptions.dart';
+import 'package:clean_architecture_tdd_course/core/error/failures.dart';
 import 'package:clean_architecture_tdd_course/core/platform/network_info.dart';
 import 'package:clean_architecture_tdd_course/features/number_trivia/data/datasources/number_trivia_local_data_source.dart';
 import 'package:clean_architecture_tdd_course/features/number_trivia/data/datasources/number_trivia_remote_data_source.dart';
@@ -75,6 +77,25 @@ void main() {
       });
 
       test(
+          'should return server failure the call to remote data source is unsuccesful',
+          () async {
+        // arrange
+        when(remoteDataSource.getConcreteNumberTrivia(any))
+            .thenThrow(ServerException());
+
+        // act
+        final result = await repository.getConcreteNumberTrivia(tNumber);
+        // assert
+        // repo returns actual entity
+        verify(remoteDataSource.getConcreteNumberTrivia(tNumber));
+        verifyZeroInteractions(localDataSource);
+        expect(
+            result,
+            Left(
+                ServerFailure())); //we can omit equals here, but prefer to put it
+      });
+
+      test(
           'should cache the data locally when the call to remote data source is successful',
           () async {
         // arrange
@@ -93,6 +114,34 @@ void main() {
     group('device is offline', () {
       setUp(() {
         when(networkInfo.isConnected).thenAnswer((_) async => false);
+      });
+
+      test(
+          'should return last locally cached data when the cached data is present',
+          () async {
+        // arrange
+        when(localDataSource.getLastNumberTrivia())
+            .thenAnswer((_) async => tNumberTriviaModel);
+        // act
+        final result = await repository.getConcreteNumberTrivia(tNumber);
+        // assert check that there is no interactions with remote data source
+        verifyZeroInteractions(remoteDataSource);
+        verify(localDataSource.getLastNumberTrivia());
+        expect(result, equals(Right(tNumberTrivia)));
+      });
+
+      test(
+          'should return CacheFailure when there is no cached data presend',
+          () async {
+        // arrange
+        when(localDataSource.getLastNumberTrivia())
+            .thenThrow(CacheException());
+        // act
+        final result = await repository.getConcreteNumberTrivia(tNumber);
+        // assert check that there is no interactions with remote data source
+        verifyZeroInteractions(remoteDataSource);
+        verify(localDataSource.getLastNumberTrivia());
+        expect(result, Left(CacheFailure()));
       });
     });
   });
