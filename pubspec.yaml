@@ -18,7 +18,9 @@ dependencies:
   # Functional programming thingiez???
   dartz: ^0.8.6
   # Remote API
-  connectivity: ^0.4.3+7
+  # connectivity: ^0.4.3+7
+  # Instead of connectivity we will use data_connection_checker
+  data_connection_checker: ^0.3.4
   http: ^0.12.0+2
   # Shared preferences
   shared_preferences: ^0.5.3+4
