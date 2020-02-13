@@ -8,7 +8,6 @@ import 'package:clean_architecture_tdd_course/features/number_trivia/data/models
 import 'package:clean_architecture_tdd_course/features/number_trivia/data/repositories/number_trivia_repository_impl.dart';
 import 'package:clean_architecture_tdd_course/features/number_trivia/domain/entities/number_trivia.dart';
 import 'package:dartz/dartz.dart';
-
 import 'package:mockito/mockito.dart';
 import 'package:flutter_test/flutter_test.dart';
 
